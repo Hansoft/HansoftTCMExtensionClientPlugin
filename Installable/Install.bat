@@ -1,0 +1,1 @@
+..\..\PluginInstaller\HansoftClientPluginInstaller.exe -clocalhost:50257:"TestCaseMngmt":Jean:welcome -icom.hansoft.tcmextension.tcmclientplugin:x86HansoftTCMExtensionClientPlugin.dll:amd64HansoftTCMExtensionClientPlugin.dll
