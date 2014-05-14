@@ -17,50 +17,11 @@ private:
 	const HPMString s_reportBugMenuAlternative = hpm_str("Report Bug");
 	const HPMString s_reportBugItem = hpm_str(".taskmenu.tcmclientplugin.reportbug");
 
-	/*********************************************
-	* Creates a new test cycle to commit selected test cases to
-	* Params:
-	*	name - the name of the new test cycle
-	*   duration - the number of days the cycle should lasta
-	*   projectUID - the id of the project to add the cycle in
-	* Returns:
-	*	The reference ID of the created sprint.
-	*********************************************/
-	HPMUniqueID createTestCycle(HPMString name, int duration, HPMUniqueID projectUID);
+	const HPMString s_reportBugDialog = hpm_str("com.hansoft.tcm.clientplugin.reportbugdialog");
+	const HPMString s_reportBugDialogBugTitle = hpm_str("/Form/BugTitle");
 
-	/*********************************************
-	* Creates an entry that can be commited to a test cycle
-	* Params:
-	*	taskRefID - the ref id of the test case to create an entry for
-	*   index - the local index of the task in the current list of test cases to add
-	*   previousTestCase - the previous tesk case to add the current one after
-	*   parent - a reference to the parent
-	* Returns:
-	*	A entry that can be used to commit a test case to a test cycle
-	*********************************************/
-	HPMTaskCreateUnifiedEntry createEntryForTestCase(HPMUniqueID taskRefID, unsigned index, HPMTaskCreateUnifiedReference &previousTestCase, HPMTaskCreateUnifiedReference &parent);
-
-	/*********************************************
-	* Adds the specified test case and any potential children to a list of cases to commit
-	* Params:
-	*	taskRefID - the ref id of the test case to create an entry for
-	*   index - the local index of the task in the current list of test cases to add
-	*   previousTestCase - the previous tesk case to add the current one after
-	*   parent - a reference to the parent
-	* Returns:
-	*	A list of entries that can be used to commit a test case to a test cycle
-	*********************************************/
-	std::vector<HPMTaskCreateUnifiedEntry> createTestCaseEntryList(HPMUniqueID taskRefID, unsigned &index, HPMTaskCreateUnifiedReference &previousTestCase, HPMTaskCreateUnifiedReference parent);
-
-	/*********************************************
-	* Checks if a parent (at any level above)  is in the list of selected tasks
-	* Params:
-	*	taskRefID - the ref id to check for parents.
-	*   selectedTasks - the lsit of selected tasks
-	* Returns:
-	*	true if a parent exists in the list
-	*********************************************/
-	bool isParentIsList(HPMUniqueID taskRefID, std::vector<HPMUniqueID> selectedTasks);
+	HPMString m_addBugDialogue;
+	HPMString m_bugTitle;
 
 	/*********************************************
 	* Called when the user has selected a number of items
@@ -77,21 +38,11 @@ private:
 	/*********************************************
 	* Called when the user invokes the report bug menu alternative.
 	*********************************************/
-	void onReportBug(std::vector<HPMUniqueID> selectedTasks, HPMUniqueID projectUID);
-
-	/*********************************************
-	* Resets the workflow status and returns the item to the backlog.
-	* Params:
-	*	taskRefID - the ref id delete and reset.
-	*********************************************/
-	void resetAndDeleteTask(HPMUniqueID taskRefID);
+	void onReportBug(HPMString bugName, std::vector<HPMUniqueID> selectedTasks, HPMUniqueID projectUID);
 
 public:
 
-	CTCMTestCycleEventHandler(HPMSdkSession *_pSession) : CTCMEventHandler(_pSession)
-	{
-		
-	};
+	CTCMTestCycleEventHandler(HPMSdkSession *_pSession);
 
 	/*********************************************
 	* Handles the actions defined in s_startCycleItem and s_endCycleItem.
@@ -116,5 +67,26 @@ public:
 	*	Returns true if the event handler wants to add something to the right click menu.
 	*********************************************/
 	virtual bool addYourStuffToRightClick(HPMRightClickContext rightClickContext, HPMString projectName, HPMString root, HansoftSection section, std::vector<HPMUniqueID> &selectedTasks);
+
+	/*********************************************
+	* Called when a custom dialog data has changed
+	* Params:
+	*	dataID - the id of the data that has changed
+	*	value - the new value for the data
+	* Returns:
+	*	Returns true if the event handler is interested in this data update
+	*********************************************/
+	virtual bool customDataUpdated(HPMString dataID, HPMString value);
+
+	/*********************************************
+	* Called when a custom dialog has exited with ok
+	* Params:
+	*	dialog - the dialog that has been closed
+	*   selectedTasks - the current selection of tasks
+	*   projectUID - the unique identifier for the current project.
+	* Returns:
+	*	Returns true if the event handler is interested in this data update
+	*********************************************/
+	virtual bool customDialogClosed(HPMString dialog, std::vector<HPMUniqueID> &selectedTasks, HPMUniqueID projectUID);
 };
 

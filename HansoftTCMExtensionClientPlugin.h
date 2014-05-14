@@ -2,6 +2,7 @@
 
 #include "TCMEventHandler.h"
 
+
 #include <tchar.h>
 #include <conio.h>
 #include <windows.h>
@@ -28,7 +29,6 @@ private:
 	};
 
 	shared_ptr<CDynamicHelper> m_pDynamicHelper;
-	HPMSdkSession *m_pSession;
 	HPMUserContext m_UserContext;
 	const HPMString s_pluginIdentifier = hpm_str("com.hansoft.tcm.clientplugin");
 
@@ -63,5 +63,20 @@ public:
 	*	_Data - the data regarding the selected item (@see HPMChangeCallbackData_RightClickMenuItemSelected)
 	*********************************************/
 	virtual void On_Callback(const HPMChangeCallbackData_RightClickMenuItemSelected &_Data);
+
+	/*********************************************
+	* Called when data has been updated in a custom dialogue
+	* Params:
+	*	_Data - the data regarding changed value (@see HPMChangeCallbackData_DynamicCustomSettingsValueChanged)
+	*********************************************/
+	virtual void On_Callback(const HPMChangeCallbackData_DynamicCustomSettingsValueChanged &_Data);
+
+
+	/*********************************************
+	* Called a custom dialog event happens
+	* Params:
+	*	_Data - the data regarding the dialog (@see HPMChangeCallbackData_DynamicCustomSettingsNotification)
+	*********************************************/
+	void On_Callback(const HPMChangeCallbackData_DynamicCustomSettingsNotification &_Data);
 };
 

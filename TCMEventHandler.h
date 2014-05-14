@@ -1,5 +1,3 @@
-#ifndef __CTCTMEVENTHANDLER_H
-#define __CTCTMEVENTHANDLER_H
 
 #include "../HansoftSDK/HPMSdkCpp.h"
 #include <tchar.h>
@@ -14,6 +12,7 @@
 
 using namespace std;
 using namespace HPMSdk;
+#pragma once
 
 class CTCMEventHandler
 {
@@ -59,6 +58,25 @@ public:
 	*	Returns true if the event handler wants to add something to the right click menu.
 	*********************************************/
 	virtual bool addYourStuffToRightClick(HPMRightClickContext rightClickContext, HPMString projectName, HPMString root, HansoftSection section, std::vector<HPMUniqueID> &selectedTasks)  { return false; };
-};
 
-#endif //__CTCTMEVENTHANDLER_H
+	/*********************************************
+	* Called when a custom dialog data has changed
+	* Params:
+	*	dataID - the id of the data that has changed
+	*	value - the new value for the data
+	* Returns:
+	*	Returns true if the event handler is interested in this data update
+	*********************************************/
+	virtual bool customDataUpdated(HPMString dataID, HPMString value)  { return false; };
+
+	/*********************************************
+	* Called when a custom dialog has exited with ok
+	* Params:
+	*	dialog - the dialog that has been closed
+	*   selectedTasks - the current selection of tasks
+	*   projectUID - the unique identifier for the current project.
+	* Returns:
+	*	Returns true if the event handler is interested in this data update
+	*********************************************/
+	virtual bool customDialogClosed(HPMString dialog, std::vector<HPMUniqueID> &selectedTasks, HPMUniqueID projectUID)  { return false; };
+};

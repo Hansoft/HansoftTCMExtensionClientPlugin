@@ -183,12 +183,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\HansoftSDK\HPMSdkCpp.cpp" />
+    <ClCompile Include="HansoftUtils.cpp" />
+    <ClCompile Include="SessionManager.cpp" />
     <ClCompile Include="TCMRequirementsEventHandler.cpp" />
     <ClCompile Include="TCMTestCycleEventHandler.cpp" />
     <ClCompile Include="HansoftTCMExtensionClientPlugin.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\HansoftSDK\HPMSdkCpp.h" />
+    <ClInclude Include="HansoftUtils.h" />
+    <ClInclude Include="SessionManager.h" />
     <ClInclude Include="TCMRequirementsEventHandler.h" />
     <ClInclude Include="TCMTestCycleEventHandler.h" />
     <ClInclude Include="HansoftTCMExtensionClientPlugin.h" />

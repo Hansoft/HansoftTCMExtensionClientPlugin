@@ -1,6 +1,8 @@
 ﻿#include "HansoftTCMExtensionClientPlugin.h"
 #include "TCMTestCycleEventHandler.h"
 #include "TCMRequirementsEventHandler.h"
+#include "SessionManager.h"
+
 
 CHansoftTCMExtension_ClientPlugin *g_pClientPlugin;
 
@@ -16,16 +18,15 @@ extern "C" mod_export void DHPMSdkCallingConvention HPMClientSDKDestroy()
 
 CHansoftTCMExtension_ClientPlugin::CHansoftTCMExtension_ClientPlugin(const void *_pClientData)
 {
-	m_pSession = nullptr;
 
 	try
 	{
 		m_UserContext = (void *)23123;
-		m_pSession = HPMSdkSession::SessionOpen(hpm_str(""), 0, hpm_str(""), hpm_str(""), hpm_str(""), this, NULL, true, EHPMSdkDebugMode_Off, _pClientData, 0, hpm_str(""), HPMSystemString(), NULL);
-
+		HPMSdkSession *pSession= HPMSdkSession::SessionOpen(hpm_str(""), 0, hpm_str(""), hpm_str(""), hpm_str(""), this, NULL, true, EHPMSdkDebugMode_Off, _pClientData, 0, hpm_str(""), HPMSystemString(), NULL);
+		SessionManager::getInstance().Initialize(pSession);
 		// Register the event handlers that will be adding items to the right click menues and handling events coming from them. 
-		m_EventHandlers.push_back(new CTCMTestCycleEventHandler(m_pSession));
-		m_EventHandlers.push_back(new CTCMRequirementsEventHandler(m_pSession));
+		m_EventHandlers.push_back(new CTCMTestCycleEventHandler(pSession));
+		m_EventHandlers.push_back(new CTCMRequirementsEventHandler(pSession));
 	}
 	catch (HPMSdkException &_Exception)
 	{
@@ -52,10 +53,10 @@ CHansoftTCMExtension_ClientPlugin::~CHansoftTCMExtension_ClientPlugin()
 		delete m_EventHandlers[i];
 	}
 	m_pDynamicHelper.reset();
-	if (m_pSession)
+	if (SessionManager::getInstance().Session())
 	{
-		HPMSdkSession::SessionDestroy(m_pSession);
-		m_pSession = nullptr;
+		HPMSdkSession::SessionDestroy(SessionManager::getInstance().Session());
+		SessionManager::getInstance().Initialize(nullptr);
 	}
 }
 
@@ -69,8 +70,8 @@ void CHansoftTCMExtension_ClientPlugin::On_Callback(const HPMChangeCallbackData_
 	{
 
 		m_pDynamicHelper = shared_ptr<CDynamicHelper>(new CDynamicHelper());
-		m_pDynamicHelper->m_RightClickSubscription = m_pSession->GlobalRegisterForRightClickNotifications(NULL);
-		m_pDynamicHelper->m_DynamicUpdateSubscription = m_pSession->GlobalRegisterForDynamicCustomSettingsNotifications(s_pluginIdentifier+hpm_str("."), m_UserContext);
+		m_pDynamicHelper->m_RightClickSubscription = SessionManager::getInstance().Session()->GlobalRegisterForRightClickNotifications(NULL);
+		m_pDynamicHelper->m_DynamicUpdateSubscription = SessionManager::getInstance().Session()->GlobalRegisterForDynamicCustomSettingsNotifications(s_pluginIdentifier + hpm_str("."), m_UserContext);
 	}
 	catch (const HPMSdk::HPMSdkException &_Exception)
 	{
@@ -94,15 +95,15 @@ void CHansoftTCMExtension_ClientPlugin::On_Callback(const HPMChangeCallbackData_
 	{
 		if (_Data.m_SelectedTasks.size() > 0)
 		{
-			m_LastSelectedProjectUID = m_pSession->UtilGetRealProjectIDFromProjectID(_Data.m_ProjectID);
+			m_LastSelectedProjectUID = SessionManager::getInstance().Session()->UtilGetRealProjectIDFromProjectID(_Data.m_ProjectID);
 			m_LastSelectedTasks = _Data.m_SelectedTasks;
-			HPMString projectName = m_pSession->ProjectGetProperties(m_LastSelectedProjectUID).m_Name;
+			HPMString projectName = SessionManager::getInstance().Session()->ProjectGetProperties(m_LastSelectedProjectUID).m_Name;
 			CTCMEventHandler::HansoftSection section;
-			if (m_pSession->UtilIsIDBacklogProject(_Data.m_ProjectID))
+			if (SessionManager::getInstance().Session()->UtilIsIDBacklogProject(_Data.m_ProjectID))
 			{
 				section = CTCMEventHandler::HansoftSection::BACKLOG;
 			}
-			else if (m_pSession->UtilIsIDProject(_Data.m_ProjectID))
+			else if (SessionManager::getInstance().Session()->UtilIsIDProject(_Data.m_ProjectID))
 			{
 				section = CTCMEventHandler::HansoftSection::SCHEDULE;
 			}
@@ -144,6 +145,55 @@ void CHansoftTCMExtension_ClientPlugin::On_Callback(const HPMChangeCallbackData_
 			for (unsigned i = 0; i < m_EventHandlers.size(); i++)
 			{
 				if (m_EventHandlers[i]->handleThis(action, m_LastSelectedTasks, m_LastSelectedProjectUID))
+					break;
+			}
+		}
+	}
+	catch (const HPMSdk::HPMSdkException &_Exception)
+	{
+		if (_Exception.GetError() == EHPMError_ConnectionLost)
+			return;
+	}
+	catch (const HPMSdk::HPMSdkCppException &)
+	{
+	}
+}
+
+void CHansoftTCMExtension_ClientPlugin::On_Callback(const HPMChangeCallbackData_DynamicCustomSettingsValueChanged &_Data)
+{
+	try
+	{
+		if (_Data.m_UserContext != m_UserContext)
+			return;
+		HPMString dataID = _Data.m_Path;
+		for (unsigned i = 0; i < m_EventHandlers.size(); i++)
+		{
+			if (m_EventHandlers[i]->customDataUpdated(dataID, _Data.m_Value))
+				break;
+		}
+	}
+	catch (const HPMSdk::HPMSdkException &_Exception)
+	{
+		if (_Exception.GetError() == EHPMError_ConnectionLost)
+			return;
+	}
+	catch (const HPMSdk::HPMSdkCppException &)
+	{
+	}
+}
+
+void CHansoftTCMExtension_ClientPlugin::On_Callback(const HPMChangeCallbackData_DynamicCustomSettingsNotification &_Data)
+{
+	try
+	{
+		if (_Data.m_UserContext != m_UserContext || !_Data.m_TabIdentifiers.size() == 1)
+			return;
+		if (_Data.m_Notification == EHPMDynamicCustomSettingsNotification_DialogEndedOk)
+		{
+			HPMString dialog = _Data.m_TabIdentifiers[0];
+			for (unsigned i = 0; i < m_EventHandlers.size(); i++)
+			{
+				if (m_EventHandlers[i]->customDialogClosed(_Data.m_TabIdentifiers[0], m_LastSelectedTasks, m_LastSelectedProjectUID))
 					break;
 			}
 		}

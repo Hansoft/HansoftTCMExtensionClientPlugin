@@ -9,6 +9,12 @@
     <ClCompile Include="TCMRequirementsEventHandler.cpp">
       <Filter>Event Handlers</Filter>
     </ClCompile>
+    <ClCompile Include="HansoftUtils.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="SessionManager.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\HansoftSDK\HPMSdkCpp.h" />
@@ -21,6 +27,13 @@
     <ClInclude Include="TCMRequirementsEventHandler.h">
       <Filter>Event Handlers</Filter>
     </ClInclude>
+    <ClInclude Include="HansoftTCMExtensionClientPlugin.h" />
+    <ClInclude Include="HansoftUtils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="SessionManager.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="LICENSE.md" />
@@ -29,6 +42,9 @@
   <ItemGroup>
     <Filter Include="Event Handlers">
       <UniqueIdentifier>{888cf42f-1592-4202-8818-8bc714fceeb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{af54cc0a-a898-4c17-a29b-942798192a40}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
