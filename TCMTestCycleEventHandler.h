@@ -19,9 +19,11 @@ private:
 
 	const HPMString s_reportBugDialog = hpm_str("com.hansoft.tcm.clientplugin.reportbugdialog");
 	const HPMString s_reportBugDialogBugTitle = hpm_str("/Form/BugTitle");
+	const HPMString s_reportBugDialogBugDesc = hpm_str("/Form/BugDesc");
 
 	HPMString m_addBugDialogue;
 	HPMString m_bugTitle;
+	HPMString m_bugDesc;
 
 	/*********************************************
 	* Called when the user has selected a number of items
@@ -38,7 +40,7 @@ private:
 	/*********************************************
 	* Called when the user invokes the report bug menu alternative.
 	*********************************************/
-	void onReportBug(HPMString bugName, std::vector<HPMUniqueID> selectedTasks, HPMUniqueID projectUID);
+	void onReportBug(HPMString bugName, HPMString bugDesc, std::vector<HPMUniqueID> selectedTasks, HPMUniqueID projectUID);
 
 public:
 

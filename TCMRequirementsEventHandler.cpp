@@ -4,7 +4,8 @@
 
 CTCMRequirementsEventHandler::CTCMRequirementsEventHandler(HPMSdkSession *_pSession) : CTCMEventHandler(_pSession)
 {
-	m_userStory = hpm_str("");
+	m_userStoryName = hpm_str("");
+	m_userStoryDesc = hpm_str("");
 	m_addUserStoryDialogue =
 		hpm_str("	DialogName \"Add user story\"\r\n")
 		hpm_str("	Item Tab\r\n")
@@ -18,9 +19,18 @@ CTCMRequirementsEventHandler::CTCMRequirementsEventHandler(HPMSdkSession *_pSess
 		hpm_str("			Identifier \"Form\"\r\n")
 		hpm_str("			Item Edit\r\n")
 		hpm_str("			{\r\n")
-		hpm_str("				Identifier \"UserStory\"\r\n")
-		hpm_str("				Name \"User story:\"\r\n")
+		hpm_str("				Identifier \"UserStoryName\"\r\n")
+		hpm_str("				Name \"User story name:\"\r\n")
+		hpm_str("				DefaultValue \"\"\r\n")
+		hpm_str("				Password 0\r\n")
+		hpm_str("			}\r\n")
+		hpm_str("			Item MultiLineEdit\r\n")
+		hpm_str("			{\r\n")
+		hpm_str("				Identifier \"UserStoryDesc\"\r\n")
+		hpm_str("				Name \"User story description:\"\r\n")
 		hpm_str("				DefaultValue \"As a .... I expect to be able to ..... so that ......\"\r\n")
+		hpm_str("				Height 150\r\n")
+		hpm_str("				ScrollBars 2\r\n")
 		hpm_str("				Password 0\r\n")
 		hpm_str("			}\r\n")
 		hpm_str("		}\r\n")
@@ -36,7 +46,8 @@ CTCMRequirementsEventHandler::CTCMRequirementsEventHandler(HPMSdkSession *_pSess
 		hpm_str("		}\r\n")
 		hpm_str("	}\r\n");
 
-	m_testSuite = hpm_str("");
+	m_testSuiteName = hpm_str("");
+	m_testSuiteDesc = hpm_str("");
 	m_addTestSuiteDialogue =
 		hpm_str("	DialogName \"Add test suite\"\r\n")
 		hpm_str("	Item Tab\r\n")
@@ -50,9 +61,18 @@ CTCMRequirementsEventHandler::CTCMRequirementsEventHandler(HPMSdkSession *_pSess
 		hpm_str("			Identifier \"Form\"\r\n")
 		hpm_str("			Item Edit\r\n")
 		hpm_str("			{\r\n")
-		hpm_str("				Identifier \"TestSuite\"\r\n")
+		hpm_str("				Identifier \"TestSuiteName\"\r\n")
+		hpm_str("				Name \"Test suite name:\"\r\n")
+		hpm_str("				DefaultValue \"\"\r\n")
+		hpm_str("				Password 0\r\n")
+		hpm_str("			}\r\n")
+		hpm_str("			Item MultiLineEdit\r\n")
+		hpm_str("			{\r\n")
+		hpm_str("				Identifier \"TestSuiteDesc\"\r\n")
 		hpm_str("				Name \"Test suite description:\"\r\n")
 		hpm_str("				DefaultValue \"\"\r\n")
+		hpm_str("				Height 150\r\n")
+		hpm_str("				ScrollBars 2\r\n")
 		hpm_str("				Password 0\r\n")
 		hpm_str("			}\r\n")
 		hpm_str("		}\r\n")
@@ -69,7 +89,6 @@ CTCMRequirementsEventHandler::CTCMRequirementsEventHandler(HPMSdkSession *_pSess
 		hpm_str("	}\r\n");
 };
 
-
 /*********************************************
 * Called when a custom dialog data has changed
 * Params:
@@ -80,14 +99,24 @@ CTCMRequirementsEventHandler::CTCMRequirementsEventHandler(HPMSdkSession *_pSess
 *********************************************/
 bool CTCMRequirementsEventHandler::customDataUpdated(HPMString dataID, HPMString value)
 {
-	if (dataID == s_addTestSuiteDialog + s_addTestSuiteDialogTestSuite)
+	if (dataID == s_addTestSuiteDialog + s_addTestSuiteDialogTestSuiteName)
 	{
-		m_testSuite = value;
+		m_testSuiteName = value;
 		return true;
 	}
-	else if (dataID == s_addUserStoryDialog + s_addUserStoryDialogUserStory)
+	else if (dataID == s_addTestSuiteDialog + s_addTestSuiteDialogTestSuiteDesc)
 	{
-		m_userStory = value;
+		m_testSuiteDesc = value;
+		return true;
+	}
+	else if (dataID == s_addUserStoryDialog + s_addUserStoryDialogUserStoryName)
+	{
+		m_userStoryName = value;
+		return true;
+	}
+	else if (dataID == s_addUserStoryDialog + s_addUserStoryDialogUserStoryDesc)
+	{
+		m_userStoryDesc = value;
 		return true;
 	}
 	return false;
@@ -106,12 +135,12 @@ bool CTCMRequirementsEventHandler::customDialogClosed(HPMString dialog, std::vec
 {
 	if (dialog == s_addTestSuiteDialog)
 	{
-		onCreateTestSuite(m_testSuite, selectedTasks, projectUID);
+		onCreateTestSuite(m_testSuiteName, m_testSuiteDesc, selectedTasks, projectUID);
 		return true;
 	}
 	else if (dialog == s_addUserStoryDialog)
 	{
-		onCreateUserStory(m_userStory, selectedTasks, projectUID);
+		onCreateUserStory(m_userStoryName, m_userStoryDesc, selectedTasks, projectUID);
 		return true;
 	}
 	return false;
@@ -130,7 +159,8 @@ bool CTCMRequirementsEventHandler::handleThis(HPMString action, std::vector<HPMU
 {
 	if (action == s_addSuiteItem)
 	{
-		m_testSuite = hpm_str("");
+		m_testSuiteName = hpm_str("");
+		m_testSuiteDesc = hpm_str("");
 
 		HPMString initialValues =
 			s_addTestSuiteDialog + hpm_str("\r\n")
@@ -148,7 +178,8 @@ bool CTCMRequirementsEventHandler::handleThis(HPMString action, std::vector<HPMU
 	}
 	else if (action == s_addUserStoryItem)
 	{
-		m_userStory = hpm_str("");
+		m_userStoryName = hpm_str("");
+		m_userStoryDesc = hpm_str("");
 
 		HPMString initialValues =
 			s_addUserStoryDialog + hpm_str("\r\n")
@@ -187,11 +218,15 @@ bool CTCMRequirementsEventHandler::addYourStuffToRightClick(HPMRightClickContext
 /*********************************************
 * Called when the user invokes the add test suite alternative
 *********************************************/
-void CTCMRequirementsEventHandler::onCreateTestSuite(HPMString testSuiteName, std::vector<HPMUniqueID> selectedTasks, HPMUniqueID projectUID)
+void CTCMRequirementsEventHandler::onCreateTestSuite(HPMString testSuiteName, HPMString testSuiteDescription, std::vector<HPMUniqueID> selectedTasks, HPMUniqueID projectUID)
 {
 	HPMUniqueID testSuiteRefID = HansoftUtils::createBacklogItem(s_testCasesProjectName, s_testSuitesRootName, testSuiteName);
+	//TODO: Set test suite description
 	if (testSuiteRefID.IsValid())
 	{
+		HPMUniqueID testSuiteUID = m_pSession->TaskRefGetTask(testSuiteRefID);
+		m_pSession->TaskSetUserStoryFlag(testSuiteUID, true);
+		m_pSession->TaskSetDetailedDescription(testSuiteUID, testSuiteDescription);
 
 		// Create the link from the created test suite to the requirement
 		HansoftUtils::createLink(selectedTasks[0], testSuiteRefID);
@@ -204,14 +239,18 @@ void CTCMRequirementsEventHandler::onCreateTestSuite(HPMString testSuiteName, st
 /*********************************************
 * Called when the user invokes the add user story alternative.
 *********************************************/
-void CTCMRequirementsEventHandler::onCreateUserStory(HPMString userStory, std::vector<HPMUniqueID> selectedTasks, HPMUniqueID projectUID)
+void CTCMRequirementsEventHandler::onCreateUserStory(HPMString userStoryTitle, HPMString userStory, std::vector<HPMUniqueID> selectedTasks, HPMUniqueID projectUID)
 {
-	HPMUniqueID testSuiteRefID = HansoftUtils::createBacklogItem(s_developmentProjectName, s_developmentRootName, userStory);
-	if (testSuiteRefID.IsValid())
+	HPMUniqueID userStoryRefID = HansoftUtils::createBacklogItem(s_developmentProjectName, s_developmentRootName, userStoryTitle);
+	//TODO: Set user story description
+	if (userStoryRefID.IsValid())
 	{
+		HPMUniqueID userStoryUID = m_pSession->TaskRefGetTask(userStoryRefID);
+		m_pSession->TaskSetUserStoryFlag(userStoryUID, true);
+		m_pSession->TaskSetDetailedDescription(userStoryUID, userStory);
 		// Create the link from the created test suite to the requirement
-		HansoftUtils::createLink(selectedTasks[0], testSuiteRefID);
-		HansoftUtils::createLink(testSuiteRefID, selectedTasks[0]);
+		HansoftUtils::createLink(selectedTasks[0], userStoryRefID);
+		HansoftUtils::createLink(userStoryRefID, selectedTasks[0]);
 
 		MessageBox(NULL, hpm_str("The user story was created"), hpm_str("Hansoft TCM plugin"), MB_OK | MB_ICONINFORMATION);
 	}

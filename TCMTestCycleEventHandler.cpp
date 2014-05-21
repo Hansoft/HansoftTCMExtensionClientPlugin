@@ -5,6 +5,7 @@
 CTCMTestCycleEventHandler::CTCMTestCycleEventHandler(HPMSdkSession *_pSession) : CTCMEventHandler(_pSession)
 {
 	m_bugTitle = hpm_str("");
+	m_bugDesc = hpm_str("");
 	m_addBugDialogue =
 		hpm_str("	DialogName \"Report bug\"\r\n")
 		hpm_str("	Item Tab\r\n")
@@ -21,6 +22,15 @@ CTCMTestCycleEventHandler::CTCMTestCycleEventHandler(HPMSdkSession *_pSession) :
 		hpm_str("				Identifier \"BugTitle\"\r\n")
 		hpm_str("				Name \"Bug title:\"\r\n")
 		hpm_str("				DefaultValue \"\"\r\n")
+		hpm_str("				Password 0\r\n")
+		hpm_str("			}\r\n")
+		hpm_str("			Item MultiLineEdit\r\n")
+		hpm_str("			{\r\n")
+		hpm_str("				Identifier \"BugDesc\"\r\n")
+		hpm_str("				Name \"Bug description:\"\r\n")
+		hpm_str("				DefaultValue \"\"\r\n")
+		hpm_str("				Height 150\r\n")
+		hpm_str("				ScrollBars 2\r\n")
 		hpm_str("				Password 0\r\n")
 		hpm_str("			}\r\n")
 		hpm_str("		}\r\n")
@@ -54,6 +64,11 @@ bool CTCMTestCycleEventHandler::customDataUpdated(HPMString dataID, HPMString va
 		m_bugTitle = value;
 		return true;
 	}
+	else if (dataID == s_reportBugDialog + s_reportBugDialogBugDesc)
+	{
+		m_bugDesc = value;
+		return true;
+	}
 	return false;
 }
 
@@ -70,7 +85,7 @@ bool CTCMTestCycleEventHandler::customDialogClosed(HPMString dialog, std::vector
 {
 	if (dialog == s_reportBugDialog)
 	{
-		onReportBug(m_bugTitle, selectedTasks, projectUID);
+		onReportBug(m_bugTitle, m_bugDesc, selectedTasks, projectUID);
 		return true;
 	}
 	return false; 
@@ -113,7 +128,6 @@ bool CTCMTestCycleEventHandler::handleThis(HPMString action, std::vector<HPMUniq
 			, initialValues
 			)
 			;
-//		onReportBug(selectedTasks, projectUID);
 		return true;
 	}
 	return false;
@@ -199,12 +213,13 @@ void CTCMTestCycleEventHandler::onEndTestCycle(std::vector<HPMUniqueID> selected
 /*********************************************
 * Called when the user invokes the report bug menu alternative.
 *********************************************/
-void CTCMTestCycleEventHandler::onReportBug(HPMString bugName, std::vector<HPMUniqueID> selectedTasks, HPMUniqueID projectUID)
+void CTCMTestCycleEventHandler::onReportBug(HPMString bugName, HPMString bugDesc, std::vector<HPMUniqueID> selectedTasks, HPMUniqueID projectUID)
 {
 	HPMUniqueID bugRefID = HansoftUtils::createBug(bugName, projectUID);
 	if (bugRefID.IsValid())
 	{
 		HPMUniqueID bugUID = m_pSession->TaskRefGetTask(bugRefID);
+		m_pSession->TaskSetDetailedDescription(bugUID, bugDesc);
 		std::wstringstream bugLink;
 		bugLink << hpm_str("Task/") << bugUID.m_ID;
 		HPMString URL = m_pSession->UtilGetHansoftURL(bugLink.str());

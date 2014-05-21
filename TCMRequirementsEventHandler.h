@@ -23,26 +23,30 @@ private:
 
 
 	const HPMString s_addUserStoryDialog = hpm_str("com.hansoft.tcm.clientplugin.adduserstorydialog");
-	const HPMString s_addUserStoryDialogUserStory = hpm_str("/Form/UserStory");
+	const HPMString s_addUserStoryDialogUserStoryName = hpm_str("/Form/UserStoryName");
+	const HPMString s_addUserStoryDialogUserStoryDesc = hpm_str("/Form/UserStoryDesc");
 
 	const HPMString s_addTestSuiteDialog = hpm_str("com.hansoft.tcm.clientplugin.addtestsuitedialog");
-	const HPMString s_addTestSuiteDialogTestSuite = hpm_str("/Form/TestSuite");
+	const HPMString s_addTestSuiteDialogTestSuiteName = hpm_str("/Form/TestSuiteName");
+	const HPMString s_addTestSuiteDialogTestSuiteDesc = hpm_str("/Form/TestSuiteDesc");
 
 	HPMString m_addUserStoryDialogue;
-	HPMString m_userStory;
+	HPMString m_userStoryName;
+	HPMString m_userStoryDesc;
 
 	HPMString m_addTestSuiteDialogue;
-	HPMString m_testSuite;
+	HPMString m_testSuiteName;
+	HPMString m_testSuiteDesc;
 
 	/*********************************************
 	* Called when the user invokes the add test suite alternative
 	*********************************************/
-	void onCreateTestSuite(HPMString testSuiteName, std::vector<HPMUniqueID> selectedTasks, HPMUniqueID projectUID);
+	void onCreateTestSuite(HPMString testSuiteName, HPMString testSuiteDescription, std::vector<HPMUniqueID> selectedTasks, HPMUniqueID projectUID);
 
 	/*********************************************
 	* Called when the user invokes the add user story alternative.
 	*********************************************/
-	void onCreateUserStory(HPMString userStory, std::vector<HPMUniqueID> selectedTasks, HPMUniqueID projectUID);
+	void onCreateUserStory(HPMString userStoryTitle, HPMString userStory, std::vector<HPMUniqueID> selectedTasks, HPMUniqueID projectUID);
 public:
 
 	CTCMRequirementsEventHandler(HPMSdkSession *_pSession);
