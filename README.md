@@ -6,16 +6,13 @@ About this program
 This program is a Hansoft SDK client plugin that adds functionality to the Hansoft client. Note that to use this
 program you need to have the SDK option enabled on your Hansoft Server.
 
-This plugin is part of the Hansoft Scaled Agile Support kit [1] and adds a menu item to the right-click menu in Hansoft called "SAFe",
-with a sub-menu item "Add feature...". Applying the "Add feature..." menu action to an epic in the SAFe portfolio backlog will prompt
-you to create a feature item to a program backlog in a separate Hansoft project. A Hansoft link will be added between the epic
-and the created feature.
+This plugin is part of the Hansoft Test case management example [1] and adds menu items to the right-click menu in Hansoft.
 
-[1]: http://github.com/Hansoft/SAFeKit  "Hansoft Scaled Agile Support kit"
+[1]: http://github.com/Hansoft/Hansoft-TCM  "Hansoft Test Case Management Example"
 
 Terms and conditions
 --------------------
-HansoftSAFeExtensionClientPlugin by Svante Lidman (Hansoft AB) is licensed under what is known as an MIT License
+HansoftSAFeExtensionClientPlugin by Samuel Rantaeskola (Hansoft AB) is licensed under what is known as an MIT License
 as stated in the [LICENSE.md](LICENSE.md).
 
 This program is not part of the official Hansoft product or subject to its license agreement.
@@ -33,7 +30,7 @@ update the references to the  Hansoft SDK in the Visual Studio project.
 
 Installation
 ------------
-Install the client plugin with the [HansoftClientPluginInstaller] [1].
+Install the client plugin with the [HansoftClientPluginInstaller] [1]. 
 [1]: http://github.com/Hansoft/HansoftClientPluginInstaller  "HansoftClientPluginInstaller"
 
 
